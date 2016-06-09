@@ -1,4 +1,8 @@
-from serialdispatch.dispatchframe import Frame
+try:
+    from serialdispatch.dispatchframe import Frame
+except ImportError:
+    from dispatchframe import Frame
+
 import threading
 import time
 import copy
@@ -12,10 +16,12 @@ class SerialDispatch(object):
     topical_data = {}
     subscribers = {}
 
-    def __init__(self, port):
+    def __init__(self, serial_port, timeout=0.0):
         """ Initializes frame and threading """
-        if port:
-            self.frame = Frame(port)
+        self.timeout = timeout
+
+        if serial_port:
+            self.frame = Frame(serial_port)
 
             self.run_thread = True
             self.thread = threading.Thread(target=self.run, args=())
@@ -272,7 +278,7 @@ class SerialDispatch(object):
                         pass
 
                     else:
-                        print('unrecognized message type')
+                        print('unrecognized message type: ', element)
 
                 # remove any data that doesn't have subscribers
                 temp_dict = copy.deepcopy(self.topical_data)
@@ -292,7 +298,8 @@ class SerialDispatch(object):
                         use low'''
                         self.topical_data.pop(key)
 
-            time.sleep(0.1)
+            if self.timeout:
+                time.sleep(self.timeout)
 
 ''' --------------------------------------------------------------------------
 Everything below this line is intended to used in conjunction with the example
@@ -301,10 +308,10 @@ Dispatch c file.  It also provides a simple 'getting started' script.
 
 if __name__ == "__main__":
     # define your serial port or supply it otherwise
-    port = serial.Serial("COM9", baudrate=57600, timeout=0.1)
+    port = serial.Serial("COM12", baudrate=57600, timeout=0.1)
 
     # create a new instance of PyDispatch
-    ps = PyDispatch(port)
+    ps = SerialDispatch(port)
 
     # create your subscribers
     def array_subscriber():
