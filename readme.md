@@ -10,6 +10,11 @@ Tests files are prefixed with `test_`.  Tests can be executed using pytest:
 
     py.test test_frame.py
     
+In truth, I'm a bit weak in Python testing, so I could use some help here.
+
+I have verified that `serialdispatch` works on Python3 in Windows 10 and on the Raspberry Pi 2
+(a Debian distribution).
+    
 # Quick Usage Notes #
 
 ## Setup ##
