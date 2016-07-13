@@ -56,24 +56,28 @@ class Frame(object):
         Returns:
             the received, de-framed message as a list
         """
-        msg = self.rx_messages.pop(0)
-        return msg
+        message = []
 
-    def push_tx_message(self, msg):
+        if len(self.rx_messages) > 0:
+            message = self.rx_messages.pop(0)
+
+        return message
+
+    def push_tx_message(self, message):
         """ Sends a message, performing all framing transparently
 
         Args:
-            msg: a list containing the message to be sent
+            message: a list containing the message to be sent
         """
         # start the frame
         frame = [self.SOF]
 
         # calc the checksum before the framing bits are added
-        checksum = self.fletcher16_checksum(msg)
-        msg.append(checksum & 0x00ff)
-        msg.append((checksum & 0xff00) >> 8)
+        checksum = self.fletcher16_checksum(message)
+        message.append(checksum & 0x00ff)
+        message.append((checksum & 0xff00) >> 8)
 
-        for element in msg:
+        for element in message:
             if element == self.SOF or element == self.EOF or element == self.ESC:
                 frame.append(self.ESC)
                 frame.append(self.ESC_XOR ^ element)
