@@ -1,19 +1,18 @@
+
+
 # Purpose #
 
 Sister library to the [Dispatch](https://github.com/slightlynybbled/Dispatch) project.
 
 # Project Maturity #
 
-The project has been informally tested but has very little test coverage at this point.
-Tests are separated into their own files and can be executed individually using pytest.
-Tests files are prefixed with `test_`.  Tests can be executed using pytest:
+The project has some testing implemented.  Testing is done using the `pytest` framework.
+Simply navigate to the root directory and execute
 
-    py.test test_frame.py
+    py.test
     
-In truth, I'm a bit weak in Python testing, so I could use some help here.
-
 I have verified that `serialdispatch` works on Python3 in Windows 10 and on the Raspberry Pi 2
-(a Debian distribution).
+(a Debian distribution) within the [curve tracer project](http://www.forembed.com/category/curve-tracer.html).
     
 # Quick Usage Notes #
 
