@@ -1,4 +1,4 @@
-from frame import Frame
+from serialdispatch.dispatchframe import Frame
 import serial
 import pytest
 import time
@@ -52,6 +52,7 @@ def test_send_with_escapes():
                      4, frame.ESC, frame.EOF ^ frame.ESC_XOR,
                      6, frame.ESC, frame.ESC ^ frame.ESC_XOR,
                      8, 9, 10, 148, 20, frame.EOF]
+                     
     print('expected: ', data_expected)
     print('actual:   ', port.serial_data_out)
 
@@ -69,8 +70,15 @@ def test_rx_is_available():
     port = MockSerialPort()
     frame = Frame(port)
 
-    port.serial_data_in = [1, 2, 3]
+    port.serial_data_in = [frame.SOF, 1, 2, frame.ESC, frame.SOF ^ frame.ESC_XOR,
+                           4, frame.ESC, frame.EOF ^ frame.ESC_XOR,
+                           6, frame.ESC, frame.ESC ^ frame.ESC_XOR,
+                           8, 9, 10, 148, 20, frame.EOF]
+    
+    
     time.sleep(0.1)
+    
+    #print(frame.rx_messages)
 
     assert frame.rx_is_available() is True
 
