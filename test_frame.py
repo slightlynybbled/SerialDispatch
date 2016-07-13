@@ -1,6 +1,5 @@
 from serialdispatch.dispatchframe import Frame
 from test_mockserial import MockSerialPort
-import pytest
 import time
 
 
