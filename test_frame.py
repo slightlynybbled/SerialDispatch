@@ -27,7 +27,7 @@ class MockSerialPort(serial.Serial):
         return data_to_return
 
 
-def test_send():
+def test_push_tx_message():
     port = MockSerialPort()
     frame = Frame(port)
 
@@ -41,7 +41,7 @@ def test_send():
     assert set(data_expected) == set(port.serial_data_out)
 
 
-def test_send_with_escapes():
+def test_push_tx_message_with_escapes():
     port = MockSerialPort()
     frame = Frame(port)
 
@@ -98,5 +98,24 @@ def test_pull_rx_message():
     data_to_receive = [1, 2, frame.SOF, 4, frame.EOF, 6, frame.ESC, 8, 9, 10]
 
     assert frame.pull_rx_message() == data_to_receive
+    
+def test_pull_rx_message_corrupted():
+    """
+    By changing one of the checksum values, this test will load data into the
+    serial port that has been corrupted and the output from the frame should
+    be an empty list.
+    """
+    port = MockSerialPort()
+    frame = Frame(port)
+    
+    # this is the serial representation of framed data, with checksum
+    port.serial_data_in = [frame.SOF, 1, 2, frame.ESC, frame.SOF ^ frame.ESC_XOR,
+                           4, frame.ESC, frame.EOF ^ frame.ESC_XOR,
+                           6, frame.ESC, frame.ESC ^ frame.ESC_XOR,
+                           8, 9, 10, 148, 21, frame.EOF]
+    
+    
+    time.sleep(0.1)
 
+    assert frame.pull_rx_message() == []
 
