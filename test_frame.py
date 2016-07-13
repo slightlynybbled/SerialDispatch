@@ -28,6 +28,8 @@ class MockSerialPort(serial.Serial):
 
 
 def test_push_tx_message():
+    """ Test to ensure that a straightforward frame may be sent """
+    
     port = MockSerialPort()
     frame = Frame(port)
 
@@ -42,6 +44,8 @@ def test_push_tx_message():
 
 
 def test_push_tx_message_with_escapes():
+    """ Test to ensure that a frame with all required escape characters may be sent """
+
     port = MockSerialPort()
     frame = Frame(port)
 
@@ -60,6 +64,8 @@ def test_push_tx_message_with_escapes():
 
 
 def test_rx_is_available_empty():
+    """ At initialization, rx available should be empty """
+
     port = MockSerialPort()
     frame = Frame(port)
 
@@ -67,6 +73,8 @@ def test_rx_is_available_empty():
 
 
 def test_rx_is_available():
+    """ When *valid* serial data is received, rx available should not be empty """
+
     port = MockSerialPort()
     frame = Frame(port)
 
@@ -82,6 +90,8 @@ def test_rx_is_available():
     assert frame.rx_is_available() is True
     
 def test_pull_rx_message():
+    """ Test the retrieval of a message """
+
     port = MockSerialPort()
     frame = Frame(port)
     
@@ -100,11 +110,7 @@ def test_pull_rx_message():
     assert frame.pull_rx_message() == data_to_receive
     
 def test_pull_rx_message_corrupted():
-    """
-    By changing one of the checksum values, this test will load data into the
-    serial port that has been corrupted and the output from the frame should
-    be an empty list.
-    """
+    """ Should not receive a corrupted message """
     port = MockSerialPort()
     frame = Frame(port)
     
