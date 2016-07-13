@@ -173,7 +173,7 @@ class Frame(object):
 
                 #print(time.strftime("%H:%M:%S") + ' frame total: {} frame errors: {}'.format(self.frames, self.frame_errors))
 
-            #time.sleep(0.1)
+            time.sleep(0.01)
 
 
 if __name__ == "__main__":
