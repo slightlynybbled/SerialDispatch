@@ -1,4 +1,4 @@
-
+![Travis CI Build Status - Master Branch](https://travis-ci.org/slightlynybbled/SerialDispatch.svg?branch=master)
 
 # Purpose #
 
