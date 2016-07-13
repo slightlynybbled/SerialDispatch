@@ -85,8 +85,13 @@ class SerialDispatch(object):
             value = self.format_specifiers[key]
             format_specifiers[value] = key
 
-        length = len(data[0])
+        if format_specifier == ['STRING']:
+            length = len(data[0][0])
+        else:
+            length = len(data[0])
         dim = len(data)
+
+        print(length)
 
         msg = []
 
@@ -112,7 +117,6 @@ class SerialDispatch(object):
                 str_array = bytearray(data[0][0], 'utf-8')
                 for e in str_array:
                     msg.append(e)
-                msg.append(0)
 
             elif e == 'U8' or e == 'S8':
                 unsigned_data8 = [x if x > 0 else x + 256 for x in data[i]]
