@@ -77,6 +77,7 @@ class SerialDispatch(object):
         if isinstance(data, str):
             length = len(data)
             dim = 1
+
         else:
             length = len(data[0])
             dim = len(data)
