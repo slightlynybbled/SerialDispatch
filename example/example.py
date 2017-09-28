@@ -11,7 +11,7 @@ sd = serialdispatch.SerialDispatch(port)
 
 def subscriber():
     # the data is retrieved by topic
-    data = sd.get_data('subscriber topic')
+    data = sd.get('subscriber topic')
     print('message received: ', data)
     
 sd.subscribe('subscriber topic', subscriber)

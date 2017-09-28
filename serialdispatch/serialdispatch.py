@@ -56,7 +56,7 @@ class SerialDispatch(object):
         if len(self.subscribers[topic]) == 0:
             self.subscribers.pop(topic)
 
-    def get_data(self, topic):
+    def get(self, topic=None):
         """ Provides a method to receive the data relevant to a topic
 
         Args:
@@ -65,7 +65,13 @@ class SerialDispatch(object):
         Returns:
             The data relating to a particular topic as a list of lists
         """
-        return self.topical_data[topic]
+        if topic is not None:
+            return self.topical_data.get(topic)
+        else:
+            return self.topical_data
+
+    def _construct_header(self):
+        pass
 
     def publish(self, topic, data, format_specifier=None):
         """ Publishes data to a particular topic
@@ -87,10 +93,11 @@ class SerialDispatch(object):
             format_specifiers[value] = key
 
         if format_specifier == ['STRING']:
-            length = len(data[0])
+            length = len(data)
+            dim = 1
         else:
             length = len(data[0])
-        dim = len(data)
+            dim = len(data)
 
         msg = []
 
@@ -101,19 +108,19 @@ class SerialDispatch(object):
         msg.append(0)   # null string terminator
 
         msg.append(dim)
-        msg.append(length & 255)
-        msg.append((length & 65280) >> 8)
+        msg.append(length & 0x00ff)
+        msg.append((length & 0xff00) >> 8)
 
         for i, e in enumerate(format_specifier):
             fs = format_specifiers[e]
             if (i & 1) == 0:
-                msg.append(fs & 15)
+                msg.append(fs & 0xf)
             else:
-                msg[-1] += ((fs & 15) << 4)
+                msg[-1] += ((fs & 0xf) << 4)
 
         for i, e in enumerate(format_specifier):
             if e == 'NONE' or e == 'STRING':
-                str_array = bytearray(data[0], 'utf-8')
+                str_array = bytearray(data, 'utf-8')
                 for e in str_array:
                     msg.append(e)
 
@@ -321,11 +328,11 @@ if __name__ == "__main__":
     # create your subscribers
     def array_subscriber():
         # retrieve received data for topic 'bar' and print to screen
-        print('data: ', ps.get_data('bar'))
+        print('data: ', ps.get('bar'))
 
     def i_subscriber():
         # retrieve received data for topic 'i' and print to screen
-        print('i: ', ps.get_data('i'))
+        print('i: ', ps.get('i'))
 
     # use the instance of PyDispatch to associate the subscriber function with the topic
     ps.subscribe('bar', array_subscriber)
