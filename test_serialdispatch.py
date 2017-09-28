@@ -14,10 +14,10 @@ def test_publish_str():
     
     # this is the data that should be contained in the serial port outbuffer
     data_test = [Frame.SOF,
-                 102, 111, 111, 0,
-                 1, 3, 0, 1, 
-                 98, 97, 114,
-                 126, 22,
+                 102, 111, 111, 0,  # 'foo\0'
+                 1, 3, 0, 1,        # 1-dimensional data, length=0x0003, datatype=string
+                 98, 97, 114,       # 'bar'
+                 126, 22,           # fletcher checksum
                  Frame.EOF]
     
     assert port.serial_data_out == data_test
