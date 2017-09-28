@@ -1,12 +1,9 @@
-try:
-    from serialdispatch.dispatchframe import Frame
-except ImportError:
-    from dispatchframe import Frame
-
 import threading
 import time
 import copy
 import serial
+
+from serialdispatch.frame import Frame
 
 
 class SerialDispatch(object):

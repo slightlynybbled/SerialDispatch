@@ -1,5 +1,5 @@
 from test_mockserial import MockSerialPort
-from serialdispatch.dispatchframe import Frame
+from serialdispatch.frame import Frame
 from serialdispatch.serialdispatch import SerialDispatch
 
 

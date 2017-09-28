@@ -1,4 +1,4 @@
-from serialdispatch.dispatchframe import Frame
+from serialdispatch.frame import Frame
 from test_mockserial import MockSerialPort
 import time
 
