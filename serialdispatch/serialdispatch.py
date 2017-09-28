@@ -67,7 +67,7 @@ class SerialDispatch(object):
         """
         return self.topical_data[topic]
 
-    def publish(self, topic, data, format_specifier=['STRING']):
+    def publish(self, topic, data, format_specifier=None):
         """ Publishes data to a particular topic
 
         Args:
@@ -77,6 +77,9 @@ class SerialDispatch(object):
                 containing a complete set of data
         """
 
+        if format_specifier in [None, 'string', 'String', 'STRING']:
+            format_specifier = ['STRING']
+
         # reverse the format specifier dictionary for convenience in this function
         format_specifiers = {}
         for key in self.format_specifiers.keys():
@@ -84,7 +87,7 @@ class SerialDispatch(object):
             format_specifiers[value] = key
 
         if format_specifier == ['STRING']:
-            length = len(data[0][0])
+            length = len(data[0])
         else:
             length = len(data[0])
         dim = len(data)
@@ -110,7 +113,7 @@ class SerialDispatch(object):
 
         for i, e in enumerate(format_specifier):
             if e == 'NONE' or e == 'STRING':
-                str_array = bytearray(data[0][0], 'utf-8')
+                str_array = bytearray(data[0], 'utf-8')
                 for e in str_array:
                     msg.append(e)
 

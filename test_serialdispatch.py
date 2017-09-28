@@ -10,7 +10,7 @@ def test_publish_str():
     sd = SerialDispatch(port)
     
     # this is the data that should be published
-    sd.publish('foo', [['bar']])
+    sd.publish('foo', ['bar'])
     
     # this is the data that should be contained in the serial port outbuffer
     data_test = [Frame.SOF,
