@@ -13,8 +13,6 @@ def test_push_tx_message():
     frame.push_tx_message(bytearray(data_to_send))
 
     data_expected = [frame.SOF, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 55, 220, frame.EOF]
-    print('expected: ', data_expected)
-    print('actual:   ', port.serial_data_out)
 
     assert set(data_expected) == set(port.serial_data_out)
 
@@ -33,9 +31,6 @@ def test_push_tx_message_with_escapes():
                      6, frame.ESC, frame.ESC ^ frame.ESC_XOR,
                      8, 9, 10, 148, 20, frame.EOF]
                      
-    print('expected: ', data_expected)
-    print('actual:   ', port.serial_data_out)
-
     assert set(data_expected) == set(port.serial_data_out)
 
 
@@ -60,11 +55,11 @@ def test_rx_is_available():
                            6, frame.ESC, frame.ESC ^ frame.ESC_XOR,
                            8, 9, 10, 148, 20, frame.EOF]
     
-    
     time.sleep(0.1)
 
     assert frame.rx_is_available() is True
-    
+
+
 def test_pull_rx_message():
     """ Test the retrieval of a message """
 
@@ -77,14 +72,14 @@ def test_pull_rx_message():
                            6, frame.ESC, frame.ESC ^ frame.ESC_XOR,
                            8, 9, 10, 148, 20, frame.EOF]
     
-    
     time.sleep(0.1)
     
     # this is the expected 'de-framed' data
     data_to_receive = [1, 2, frame.SOF, 4, frame.EOF, 6, frame.ESC, 8, 9, 10]
 
     assert frame.pull_rx_message() == data_to_receive
-    
+
+
 def test_pull_rx_message_corrupted():
     """ Should not receive a corrupted message """
     port = MockSerialPort()

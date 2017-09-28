@@ -39,7 +39,8 @@ def test_publish_3_u8():
                  Frame.EOF]
     
     assert port.serial_data_out == data_test
-    
+
+
 def test_publish_3_s8():
     port = MockSerialPort()
     sd = SerialDispatch(port)
@@ -56,6 +57,7 @@ def test_publish_3_s8():
                  Frame.EOF]
     
     assert port.serial_data_out == data_test
+
 
 def test_publish_3x3_u8u16u32():
     port = MockSerialPort()
@@ -75,7 +77,8 @@ def test_publish_3x3_u8u16u32():
                  Frame.EOF]
     
     assert port.serial_data_out == data_test
-    
+
+
 def test_publish_3x3_s8s16s32():
     port = MockSerialPort()
     sd = SerialDispatch(port)
@@ -87,11 +90,10 @@ def test_publish_3x3_s8s16s32():
     data_test = [Frame.SOF,
                  102, 111, 111, 0,
                  3, 3, 0, 0x53, 0x07, 
-                 246, 246 ^ 0x20, 236, 226, # <= one of these happens to be an esc char
+                 246, 246 ^ 0x20, 236, 226,  # <= one of these happens to be an esc char
                  216, 255, 206, 255, 196, 255,
                  186, 255, 255, 255, 176, 255, 255, 255, 166, 255, 255, 255,
                  214, 236,
                  Frame.EOF]
     
     assert port.serial_data_out == data_test
-    

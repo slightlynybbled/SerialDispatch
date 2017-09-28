@@ -1,6 +1,4 @@
-import serial
-
-class MockSerialPort(serial.Serial):
+class MockSerialPort:
     """ This is a class that will provide a mock interface for the serial port """
 
     def __init__(self):
