@@ -1,13 +1,32 @@
+import pytest
+
 from test_mockserial import MockSerialPort
 from serialdispatch.frame import Frame
 from serialdispatch.serialdispatch import SerialDispatch
 
 
-def test_publish_str():
-    """ test publish """
-    
+@pytest.fixture()
+def sending_fixture():
     port = MockSerialPort()
     sd = SerialDispatch(port)
+
+    yield port, sd
+
+
+@pytest.fixture()
+def subscribing_fixture():
+    port = MockSerialPort()
+    sd = SerialDispatch(port)
+
+    #sd.subscribe('foo', )
+
+    yield port, sd
+
+
+def test_publish_str(sending_fixture):
+    """ test publish """
+    
+    port, sd = sending_fixture
     
     # this is the data that should be published
     sd.publish('foo', 'bar')
@@ -23,9 +42,8 @@ def test_publish_str():
     assert port.serial_data_out == data_test
 
 
-def test_publish_3_u8():
-    port = MockSerialPort()
-    sd = SerialDispatch(port)
+def test_publish_3_u8(sending_fixture):
+    port, sd = sending_fixture
     
     # this is the data that should be published
     sd.publish('foo', [[10, 20, 30]], ['U8'])
@@ -41,9 +59,8 @@ def test_publish_3_u8():
     assert port.serial_data_out == data_test
 
 
-def test_publish_3_s8():
-    port = MockSerialPort()
-    sd = SerialDispatch(port)
+def test_publish_3_s8(sending_fixture):
+    port, sd = sending_fixture
     
     # this is the data that should be published
     sd.publish('foo', [[-10, -20, -30]], ['S8'])
@@ -59,9 +76,8 @@ def test_publish_3_s8():
     assert port.serial_data_out == data_test
 
 
-def test_publish_3x3_u8u16u32():
-    port = MockSerialPort()
-    sd = SerialDispatch(port)
+def test_publish_3x3_u8u16u32(sending_fixture):
+    port, sd = sending_fixture
     
     # this is the data that should be published
     sd.publish('foo', [[10, 20, 30], [40, 50, 60], [70, 80, 90]], ['U8', 'U16', 'U32'])
@@ -79,9 +95,8 @@ def test_publish_3x3_u8u16u32():
     assert port.serial_data_out == data_test
 
 
-def test_publish_3x3_s8s16s32():
-    port = MockSerialPort()
-    sd = SerialDispatch(port)
+def test_publish_3x3_s8s16s32(sending_fixture):
+    port, sd = sending_fixture
     
     # this is the data that should be published
     sd.publish('foo', [[-10, -20, -30], [-40, -50, -60], [-70, -80, -90]], ['S8', 'S16', 'S32'])
