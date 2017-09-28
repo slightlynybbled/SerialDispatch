@@ -1,9 +1,18 @@
 from setuptools import setup, find_packages
+import os
+
+# ---------------------------------
+# imports the version from the package
+here = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(here, 'readme.md')) as f:
+    README = f.read()
+exec(open(os.path.join(here, 'serialdispatch/version.py')).read())
 
 setup(name='serialdispatch',
-      version ='0.13',
+      version=__version__,
       url='https://github.com/slightlynybbled/SerialDispatch',
       description='Easy serial communication using Dispatch',
+      long_description=README,
       author='Jason Jones',
       author_email='slightlynybbled@gmail.com',
       classifiers=[
@@ -22,6 +31,6 @@ setup(name='serialdispatch',
       ],
       license='MIT',
       packages=find_packages(),
-      install_requires=['pyserial'],
+      install_requires=['pyserial >= 3.4'],
       zip_safe=False
 )
