@@ -1,6 +1,10 @@
 import threading
 import time
 import serial
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class Frame(object):
@@ -31,13 +35,14 @@ class Frame(object):
         except serial.SerialException:
             self.port = None
             self.raw = []
-            print("Error accessing the serial port")
+            logger.error("Error accessing the serial port")
 
     def __del__(self):
         """ Closes the serial port """
         if self.port is not None:
             self.port.close()
 
+    @property
     def rx_is_available(self):
         """ Determines if rx data is available and returns the value
 
@@ -73,7 +78,7 @@ class Frame(object):
         frame = [self.SOF]
 
         # calc the checksum before the framing bits are added
-        checksum = self.fletcher16_checksum(message)
+        checksum = self._fletcher16_checksum(message)
         message.append(checksum & 0x00ff)
         message.append((checksum & 0xff00) >> 8)
 
@@ -89,7 +94,7 @@ class Frame(object):
 
         return
 
-    def fletcher16_checksum(self, data):
+    def _fletcher16_checksum(self, data):
         """ Calculates the fletcher16 checksum on a list of data
 
         Args:
@@ -165,7 +170,7 @@ class Frame(object):
                 self.frames += 1
 
                 # calculate the checksum
-                calc_cs = self.fletcher16_checksum(message)
+                calc_cs = self._fletcher16_checksum(message)
                 if calc_cs == f16_check:
                     self.rx_messages.append(message)
                 else:
@@ -175,6 +180,8 @@ class Frame(object):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+
     # define your serial port or supply it otherwise
     port = serial.Serial("COM9", baudrate=57600, timeout=0.1)
     f = Frame(port)

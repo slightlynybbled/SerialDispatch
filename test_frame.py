@@ -40,7 +40,7 @@ def test_rx_is_available_empty():
     port = MockSerialPort()
     frame = Frame(port)
 
-    assert not frame.rx_is_available()
+    assert not frame.rx_is_available
 
 
 def test_rx_is_available():
@@ -57,7 +57,7 @@ def test_rx_is_available():
     
     time.sleep(0.1)
 
-    assert frame.rx_is_available() is True
+    assert frame.rx_is_available is True
 
 
 def test_pull_rx_message():

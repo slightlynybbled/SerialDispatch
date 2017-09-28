@@ -146,7 +146,7 @@ class SerialDispatch(object):
     def run(self):
         """ Monitors received data and properly formats it """
         while self.run_thread:
-            while self.frame.rx_is_available():
+            while self.frame.rx_is_available:
                 msg = self.frame.pull_rx_message()
 
                 # find the first '0' in the msg
