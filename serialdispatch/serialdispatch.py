@@ -2,8 +2,12 @@ import threading
 import time
 import copy
 import serial
+import logging
 
 from serialdispatch.frame import Frame
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class SerialDispatch(object):
@@ -17,15 +21,12 @@ class SerialDispatch(object):
         """ Initializes frame and threading """
         self.timeout = timeout
 
-        if serial_port:
-            self.frame = Frame(serial_port)
+        self.frame = Frame(serial_port)
 
-            self.run_thread = True
-            self.thread = threading.Thread(target=self.run, args=())
-            self.thread.daemon = True
-            self.thread.start()
-        else:
-            print("Serial port not provided")
+        self.run_thread = True
+        self.thread = threading.Thread(target=self.run, args=())
+        self.thread.daemon = True
+        self.thread.start()
 
     def close(self):
         self.run_thread = False
@@ -37,10 +38,10 @@ class SerialDispatch(object):
             topic: a string representing the topic which is being subscribed to
             callback: a function which is to be called when the topic is received
         """
-        try:
-            self.subscribers[topic].append(callback)
-        except:
+        if topic not in self.subscribers.keys():
             self.subscribers[topic] = [callback]
+        else:
+            self.subscribers[topic].append(callback)
 
     def unsubscribe(self, topic, callback):
         """ Removes the callback from the specified topic
@@ -88,8 +89,6 @@ class SerialDispatch(object):
             length = len(data[0])
         dim = len(data)
 
-        print(length)
-
         msg = []
 
         # create the header
@@ -136,7 +135,7 @@ class SerialDispatch(object):
                     msg.append((x & 4278190080) >> 24)
 
             else:
-                print('width not supported')
+                logger.error('width not supported: {}'.format(e))
 
         msg_to_send = copy.deepcopy(msg)
         self.frame.push_tx_message(msg_to_send)
@@ -276,10 +275,10 @@ class SerialDispatch(object):
                         msg = msg[length * 4:]
 
                     elif element == 'FLOAT':
-                        pass
+                        logger.error('FLOAT not currently supported!')
 
                     else:
-                        print('unrecognized message type: ', element)
+                        logger.error('unrecognized message type: {}'.format(element))
 
                 # remove any data that doesn't have subscribers
                 temp_dict = copy.deepcopy(self.topical_data)
@@ -308,6 +307,8 @@ Dispatch c file.  It also provides a simple 'getting started' script.
 --------------------------------------------------------------------------'''
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+
     # define your serial port or supply it otherwise
     port = serial.Serial("COM12", baudrate=57600, timeout=0.1)
 
