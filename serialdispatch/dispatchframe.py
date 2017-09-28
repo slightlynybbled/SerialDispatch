@@ -7,10 +7,10 @@ class Frame(object):
     """  Read/Write of serial port, framing and de-framing of data  """
 
     # some useful constants
-    SOF = int(b'f7', 16)
-    EOF = int(b'7f', 16)
-    ESC = int(b'f6', 16)
-    ESC_XOR = int(b'20', 16)
+    SOF = 0xf7
+    EOF = 0x7f
+    ESC = 0xf6
+    ESC_XOR = 0x20
 
     def __init__(self, port):
         """ Initializes the serial port and creates object threads """
