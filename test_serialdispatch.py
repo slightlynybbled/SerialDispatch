@@ -177,7 +177,7 @@ def test_subscribing_3_s8(subscribing_fixture):
 
     port, sd = subscribing_fixture
 
-    # this is the data that should be contained in the serial port outbuffer
+    # this is the data that should be contained in the serial port input buffer
     port.serial_data_in = [
         Frame.SOF,
         102, 111, 111, 0,
@@ -198,7 +198,7 @@ def test_subscribing_3x3_u8u16u32(subscribing_fixture):
 
     port, sd = subscribing_fixture
 
-    # this is the data that should be contained in the serial port outbuffer
+    # this is the data that should be contained in the serial port input buffer
     port.serial_data_in = [
         Frame.SOF,
         102, 111, 111, 0,
@@ -223,7 +223,7 @@ def test_subscribe_3x3_s8s16s32(subscribing_fixture):
 
     port, sd = subscribing_fixture
 
-    # this is the data that should be contained in the serial port outbuffer
+    # this is the data that should be contained in the serial port input buffer
     port.serial_data_in = [
         Frame.SOF,
         102, 111, 111, 0,
