@@ -2,7 +2,7 @@ import pytest
 
 from test_mockserial import MockSerialPort
 from serialdispatch.frame import Frame
-from serialdispatch.serialdispatch import SerialDispatch
+from serialdispatch.sdispatch import SerialDispatch
 
 
 process_data = None

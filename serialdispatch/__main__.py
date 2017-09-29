@@ -4,6 +4,7 @@ import click
 from serial import Serial
 
 from serialdispatch import __version__
+from serialdispatch import SerialDispatch
 
 
 logger = logging.getLogger(__name__)
@@ -27,8 +28,23 @@ def main(port, baudrate, version):
         logger.warning('baudrate not specified, defaulting to {}b/s'.format(baudrate))
 
     baudrate = int(baudrate)
-    port = Serial(port=port, baudrate=baudrate)
+    logger.info('using {} at {}b/s'.format(port, baudrate))
 
+    port = Serial(port=port, baudrate=baudrate)
+    sd = SerialDispatch(port=port)
+
+    def plot():
+        sd.get('show')
+
+    def log():
+        sd.get('log')
+
+    def csv():
+        sd.get('csv')
+
+    sd.subscribe('show', plot)
+    sd.subscribe('log', log)
+    sd.subscribe('csv', csv)
 
 if __name__ == '__main__':
     main()

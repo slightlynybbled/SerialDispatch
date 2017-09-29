@@ -17,11 +17,11 @@ class SerialDispatch(object):
     topical_data = {}
     subscribers = {}
 
-    def __init__(self, serial_port, timeout=0.0, threaded=True):
+    def __init__(self, port, timeout=0.001, threaded=True):
         """ Initializes frame and threading """
         self.timeout = timeout
 
-        self.frame = Frame(serial_port, threaded=False)
+        self.frame = Frame(port, threaded=False)
 
         self.threaded = threaded
         self.thread = threading.Thread(target=self.run, args=())

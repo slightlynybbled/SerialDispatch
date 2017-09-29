@@ -1,2 +1,2 @@
-from serialdispatch.serialdispatch import SerialDispatch
+from serialdispatch.sdispatch import SerialDispatch
 from serialdispatch.version import __version__
