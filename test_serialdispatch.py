@@ -170,3 +170,74 @@ def test_subscribing_3_u8(subscribing_fixture):
 
     assert process_data
     assert process_data[0] == [10, 20, 30]
+
+
+def test_subscribing_3_s8(subscribing_fixture):
+    assert process_data is None
+
+    port, sd = subscribing_fixture
+
+    # this is the data that should be contained in the serial port outbuffer
+    port.serial_data_in = [
+        Frame.SOF,
+        102, 111, 111, 0,
+        1, 3, 0, 3,
+        246, 246 ^ 0x20, 236, 226,
+        15, 96,
+        Frame.EOF
+    ]
+
+    sd.run()
+
+    assert process_data
+    assert process_data[0] == [-10, -20, -30]
+
+
+def test_subscribing_3x3_u8u16u32(subscribing_fixture):
+    assert process_data is None
+
+    port, sd = subscribing_fixture
+
+    # this is the data that should be contained in the serial port outbuffer
+    port.serial_data_in = [
+        Frame.SOF,
+        102, 111, 111, 0,
+        3, 3, 0, 0x42, 0x06,
+        10, 20, 30,
+        40, 0, 50, 0, 60, 0,
+        70, 0, 0, 0, 80, 0, 0, 0, 90, 0, 0, 0,
+        84, 186,
+        Frame.EOF
+    ]
+
+    sd.run()
+
+    assert process_data
+    assert process_data[0] == [10, 20, 30]
+    assert process_data[1] == [40, 50, 60]
+    assert process_data[2] == [70, 80, 90]
+
+
+def test_subscribe_3x3_s8s16s32(subscribing_fixture):
+    assert process_data is None
+
+    port, sd = subscribing_fixture
+
+    # this is the data that should be contained in the serial port outbuffer
+    port.serial_data_in = [
+        Frame.SOF,
+        102, 111, 111, 0,
+        3, 3, 0, 0x53, 0x07,
+        246, 246 ^ 0x20, 236, 226,  # <= one of these happens to be an esc char
+        216, 255, 206, 255, 196, 255,
+        186, 255, 255, 255, 176, 255, 255, 255, 166, 255, 255, 255,
+        214, 236,
+        Frame.EOF
+    ]
+
+    sd.run()
+
+    assert process_data
+    assert process_data[0] == [-10, -20, -30]
+    assert process_data[1] == [-40, -50, -60]
+    assert process_data[2] == [-70, -80, -90]
