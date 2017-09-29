@@ -16,7 +16,7 @@ class Frame(object):
     ESC = 0xf6
     ESC_XOR = 0x20
 
-    def __init__(self, port):
+    def __init__(self, port, timeout=0.1, threaded=True):
         """ Initializes the serial port and creates object threads """
         # initialize the serial port
         try:
@@ -28,9 +28,13 @@ class Frame(object):
             self.frames = 0
             self.frame_errors = 0
 
-            thread = threading.Thread(target=self.run, args=())
-            thread.daemon = True
-            thread.start()
+            self.timeout = timeout
+            self.threaded = threaded
+
+            if self.threaded:
+                thread = threading.Thread(target=self.run, args=())
+                thread.daemon = True
+                thread.start()
 
         except serial.SerialException:
             self.port = None
@@ -126,7 +130,9 @@ class Frame(object):
         it attaches the de-framed data to the outgoing que to be read.
 
         """
-        while True:
+        run_once = True
+
+        while self.threaded or run_once:
             for element in self.port.read(1000):
                 self.raw.append(element)
 
@@ -176,7 +182,10 @@ class Frame(object):
                 else:
                     self.frame_errors += 1
 
-            time.sleep(0.01)
+            run_once = False
+
+            if self.threaded:
+                time.sleep(self.timeout)
 
 
 if __name__ == "__main__":

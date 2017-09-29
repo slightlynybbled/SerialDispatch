@@ -17,19 +17,19 @@ class SerialDispatch(object):
     topical_data = {}
     subscribers = {}
 
-    def __init__(self, serial_port, timeout=0.0):
+    def __init__(self, serial_port, timeout=0.0, threaded=True):
         """ Initializes frame and threading """
         self.timeout = timeout
 
-        self.frame = Frame(serial_port)
+        self.frame = Frame(serial_port, threaded=False)
 
-        self.run_thread = True
+        self.threaded = threaded
         self.thread = threading.Thread(target=self.run, args=())
         self.thread.daemon = True
         self.thread.start()
 
     def close(self):
-        self.run_thread = False
+        self.threaded = False
 
     def subscribe(self, topic, callback):
         """ Adds a callback method to a topic
@@ -144,7 +144,10 @@ class SerialDispatch(object):
 
     def run(self):
         """ Monitors received data and properly formats it """
-        while self.run_thread:
+        run_once = True
+        while self.threaded or run_once:
+            self.frame.run()
+
             while self.frame.rx_is_available:
                 msg = self.frame.pull_rx_message()
 
@@ -300,6 +303,9 @@ class SerialDispatch(object):
 
             if self.timeout:
                 time.sleep(self.timeout)
+
+            if not self.threaded:
+                run_once = False
 
 ''' --------------------------------------------------------------------------
 Everything below this line is intended to used in conjunction with the example

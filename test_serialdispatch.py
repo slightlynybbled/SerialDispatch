@@ -5,20 +5,13 @@ from serialdispatch.frame import Frame
 from serialdispatch.serialdispatch import SerialDispatch
 
 
+process_data = None
+
+
 @pytest.fixture()
 def sending_fixture():
     port = MockSerialPort()
     sd = SerialDispatch(port)
-
-    yield port, sd
-
-
-@pytest.fixture()
-def subscribing_fixture():
-    port = MockSerialPort()
-    sd = SerialDispatch(port)
-
-    #sd.subscribe('foo', )
 
     yield port, sd
 
@@ -112,3 +105,68 @@ def test_publish_3x3_s8s16s32(sending_fixture):
                  Frame.EOF]
     
     assert port.serial_data_out == data_test
+
+
+@pytest.fixture()
+def subscribing_fixture():
+    global process_data
+
+    port = MockSerialPort()
+    sd = SerialDispatch(port, threaded=False)
+
+    process_data = None
+
+    def toggle_flag():
+        global process_data
+        nonlocal sd
+        process_data = sd.get('foo')
+
+    sd.subscribe('foo', toggle_flag)
+
+    yield port, sd
+
+
+def test_subscribing_init(subscribing_fixture):
+    port, sd = subscribing_fixture
+
+    assert process_data is None
+
+
+def test_subscribing_string(subscribing_fixture):
+    assert process_data is None
+
+    port, sd = subscribing_fixture
+
+    port.serial_data_in = [
+        Frame.SOF,
+        102, 111, 111, 0,  # 'foo\0'
+        1, 3, 0, 1,        # 1-dimensional data, length=0x0003, datatype=string
+        98, 97, 114,       # 'bar'
+        126, 22,           # fletcher checksum
+        Frame.EOF
+    ]
+
+    sd.run()
+
+    assert process_data
+    assert process_data == 'bar'
+
+
+def test_subscribing_3_u8(subscribing_fixture):
+    assert process_data is None
+
+    port, sd = subscribing_fixture
+
+    port.serial_data_in = [
+        Frame.SOF,
+        102, 111, 111, 0,
+        1, 3, 0, 2,
+        10, 20, 30,
+        134, 36,
+        Frame.EOF
+    ]
+
+    sd.run()
+
+    assert process_data
+    assert process_data[0] == [10, 20, 30]
