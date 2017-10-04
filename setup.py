@@ -11,7 +11,7 @@ exec(open(os.path.join(here, 'serialdispatch/version.py')).read())
 requirements = [
     'click >= 6.7',
     'pyserial >= 3.4',
-    'tk_tools >= 0.3.0'
+    'matplotlib >= 2.0.2'
 ]
 
 setup(

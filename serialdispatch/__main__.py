@@ -7,7 +7,6 @@ from serial import Serial
 
 from serialdispatch import __version__
 from serialdispatch import SerialDispatch
-from serialdispatch.sdisplot import PlotApp
 
 
 logger = logging.getLogger(__name__)
@@ -38,18 +37,14 @@ def main(port, baudrate, log_path, csv_path, version):
     port = Serial(port=port, baudrate=baudrate, timeout=0.01)
     sd = SerialDispatch(port=port)
 
-    plot_app, log_display, csv_file = None, None, None
+    csv_header = None
 
     def plot(data):
-        """ this will plot the received data """
-
+        nonlocal plot_app
         logger.debug('plot data received: {}'.format(data))
 
-        nonlocal plot_app
-        if not plot_app:
-            plot_app = PlotApp()
-
-        plot_app.load_new_data(data)
+        '''for i, e in enumerate(data):
+            add_point(i, e)'''
 
     def log(data):
         if not log_path:
@@ -59,7 +54,22 @@ def main(port, baudrate, log_path, csv_path, version):
             f.write('{} - {}\n'.format(datetime.now(), data))
 
     def csv(data):
-        raise NotImplementedError
+        nonlocal csv_header
+
+        # a string coming in is most likely a header, parse it and save it
+        if isinstance(data, str):
+            with open(csv_path, 'a') as f:
+                parts = [e.strip() for e in data.split(',')]
+                new_header = ','.join(parts)
+                if csv_header != new_header:
+                    csv_header = new_header
+                    f.write(csv_header + '\n')
+                return
+
+        if not isinstance(data[0], list):
+            with open(csv_path, 'a') as f:
+                parts = ['{}'.format(p) for p in data]
+                f.write('{}\n'.format(','.join(parts)))
 
     sd.subscribe('plot', plot)
     sd.subscribe('log', log)
