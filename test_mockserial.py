@@ -1,6 +1,8 @@
 class MockSerialPort:
     """ This is a class that will provide a mock interface for the serial port """
 
+    baudrate = 57600
+
     def __init__(self):
         self.serial_data_out = []
         self.serial_data_in = []

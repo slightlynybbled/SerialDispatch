@@ -116,10 +116,10 @@ def subscribing_fixture():
 
     process_data = None
 
-    def toggle_flag():
+    def toggle_flag(data):
         global process_data
         nonlocal sd
-        process_data = sd.get('foo')
+        process_data = data
 
     sd.subscribe('foo', toggle_flag)
 
@@ -169,7 +169,7 @@ def test_subscribing_3_u8(subscribing_fixture):
     sd.run()
 
     assert process_data
-    assert process_data[0] == [10, 20, 30]
+    assert process_data == [10, 20, 30]
 
 
 def test_subscribing_3_s8(subscribing_fixture):
@@ -190,7 +190,7 @@ def test_subscribing_3_s8(subscribing_fixture):
     sd.run()
 
     assert process_data
-    assert process_data[0] == [-10, -20, -30]
+    assert process_data == [-10, -20, -30]
 
 
 def test_subscribing_3x3_u8u16u32(subscribing_fixture):

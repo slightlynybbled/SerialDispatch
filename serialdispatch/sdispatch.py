@@ -61,35 +61,22 @@ class SerialDispatch(object):
 
         logger.debug('subscribers to "{}" updated: {}'.format(topic, self.subscribers[topic]))
 
-    def get(self, topic=None):
-        """ Provides a method to receive the data relevant to a topic
+    def _simplify_data(self, data):
+        if isinstance(data, list):
+            if len(data[0]) == 1:
+                return data[0][0]
 
-        Args:
-            topic: the topic string
+            if len(data) == 1:
+                return data[0]
 
-        Returns:
-            The data relating to a particular topic as a list of lists
-        """
-        if topic is not None:
-            data = self.topical_data.get(topic)
-            if isinstance(data, list):
-                if len(data) == 1:
-                    data = data[0]
-
-            if isinstance(data, list):
-                if len(data) == 1:
-                    data = data[0]
-
-            return data
-        else:
-            return self.topical_data
+        return data
 
     def _construct_header(self, topic, data, format_specifier):
         header = [e for e in bytearray(topic, 'utf-8')]
         header.append(0)
 
-        if isinstance(data, str):
-            length = len(data)
+        if isinstance(data[0][0], str):
+            length = len(data[0][0])
             dim = 1
 
         else:
@@ -326,7 +313,8 @@ class SerialDispatch(object):
                     else:
                         # execute callbacks
                         for callback in self.subscribers[key]:
-                            callback(self.topical_data.get(key))
+                            data = self._simplify_data(self.topical_data.get(key))
+                            callback(data)
 
                         ''' at this point, the data should have
                         been consumed by the function and can
