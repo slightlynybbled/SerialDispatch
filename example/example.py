@@ -8,7 +8,7 @@ logger.setLevel(logging.DEBUG)
 logging.basicConfig(level=logging.DEBUG)
 
 # the timeout keeps the serial port polling appropriately
-port = serial.Serial('COM18', 57600, timeout=0.1)
+port = serial.Serial('COM18', 57600, timeout=0.01)
 
 # a serial port must be supplied to SerialDispatch
 sd = serialdispatch.SerialDispatch(port)
@@ -56,7 +56,7 @@ interval = 0.005
 while True:
     sd.publish('received', ' ')
     sd.publish('string', 'data')
-    sd.publish('i', i, ['U16'])
+    sd.publish('i', i, 'U16')
     sd.publish('array', [-1, -2, -3, -4], 'S16')
     sd.publish('arrays8', [[-1, -2, -3, -4], [1, 2, 3, 4]], ['S8', 'U8'])
     sd.publish('arrays16', [[-1, -2, -3, -4], [1, 2, 3, 4]], ['S16', 'U16'])
