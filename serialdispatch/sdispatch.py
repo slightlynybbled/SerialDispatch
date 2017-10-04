@@ -7,7 +7,7 @@ import logging
 from serialdispatch.frame import Frame
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 
 class SerialDispatch(object):
@@ -43,6 +43,8 @@ class SerialDispatch(object):
         else:
             self.subscribers[topic].append(callback)
 
+        logger.debug('subscribers to "{}" updated: {}'.format(topic, self.subscribers[topic]))
+
     def unsubscribe(self, topic, callback):
         """ Removes the callback from the specified topic
 
@@ -55,6 +57,8 @@ class SerialDispatch(object):
 
         if len(self.subscribers[topic]) == 0:
             self.subscribers.pop(topic)
+
+        logger.debug('subscribers to "{}" updated: {}'.format(topic, self.subscribers[topic]))
 
     def get(self, topic=None):
         """ Provides a method to receive the data relevant to a topic
@@ -105,6 +109,17 @@ class SerialDispatch(object):
             data: a list of lists, each internal list
                 containing a complete set of data
         """
+        logger.debug('publishing data to {}'.format(topic))
+
+        # check the 'data' for the simplest formats, convert to the list of lists as appropriate
+        if isinstance(data, list):
+            if not isinstance(data[0], list):
+                data = [data]
+        else:
+            data = [[data]]
+
+        logger.debug('sending data: {}'.format(data))
+
         if format_specifier in [None, 'string', 'String', 'STRING']:
             format_specifier = ['STRING']
 
@@ -149,7 +164,9 @@ class SerialDispatch(object):
             self.frame.run()
 
             while self.frame.rx_is_available:
+
                 msg = self.frame.pull_rx_message()
+                logger.debug('data received: {}'.format(msg))
 
                 # find the first '0' in the msg
                 zero_index = 0
