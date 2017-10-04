@@ -7,7 +7,7 @@ import logging
 from serialdispatch.frame import Frame
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 class SerialDispatch(object):
@@ -17,9 +17,10 @@ class SerialDispatch(object):
     topical_data = {}
     subscribers = {}
 
-    def __init__(self, port, timeout=0.001, threaded=True):
+    def __init__(self, port, timeout=0.003, threaded=True):
         """ Initializes frame and threading """
         self.timeout = timeout
+        self.port = port
 
         self.frame = Frame(port, threaded=False)
 
@@ -70,7 +71,16 @@ class SerialDispatch(object):
             The data relating to a particular topic as a list of lists
         """
         if topic is not None:
-            return self.topical_data.get(topic)
+            data = self.topical_data.get(topic)
+            if isinstance(data, list):
+                if len(data) == 1:
+                    data = data[0]
+
+            if isinstance(data, list):
+                if len(data) == 1:
+                    data = data[0]
+
+            return data
         else:
             return self.topical_data
 
@@ -123,11 +133,14 @@ class SerialDispatch(object):
         if format_specifier in [None, 'string', 'String', 'STRING']:
             format_specifier = ['STRING']
 
+        if not isinstance(format_specifier, list):
+            format_specifier = [format_specifier]
+
         msg = self._construct_header(topic, data, format_specifier)
 
         for i, e in enumerate(format_specifier):
             if e == 'NONE' or e == 'STRING':
-                msg.extend(bytearray(data, 'utf-8'))
+                msg.extend(bytearray(data[0][0], 'utf-8'))
 
             elif e == 'U8' or e == 'S8':
                 unsigned_data8 = [x if x > 0 else x + 256 for x in data[i]]
@@ -154,6 +167,9 @@ class SerialDispatch(object):
 
         msg_to_send = copy.deepcopy(msg)
         self.frame.push_tx_message(msg_to_send)
+
+        processing_time = self.timeout + (len(msg_to_send) * 8.0/self.port.baudrate)
+        time.sleep(processing_time)    # provide a small gap between publishes to allow the uC to process the messages
 
         return msg
 
