@@ -325,8 +325,8 @@ class SerialDispatch(object):
 
                     else:
                         # execute callbacks
-                        for element in self.subscribers[key]:
-                            element()
+                        for callback in self.subscribers[key]:
+                            callback(self.topical_data.get(key))
 
                         ''' at this point, the data should have
                         been consumed by the function and can

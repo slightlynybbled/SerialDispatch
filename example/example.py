@@ -14,39 +14,32 @@ port = serial.Serial('COM18', 57600, timeout=0.1)
 sd = serialdispatch.SerialDispatch(port)
 
 
-def messages_received_subscriber():
-    messages_received = sd.get('received')
-    print('\nuc processed: {}'.format(messages_received))
+def messages_received_subscriber(data):
+    print('\nuc processed: {}'.format(data))
 
 
-def string_subscriber():
-    data = sd.get('string')
+def string_subscriber(data):
     print('string received: ', data)
 
 
-def i_subscriber():
+def i_subscriber(data):
     # the data is retrieved by topic
-    data = sd.get('i')
     print('i received: ', data)
 
 
-def array_subscriber():
-    data = sd.get('array')
+def array_subscriber(data):
     print('array received: ', data)
 
 
-def arrays8_subscriber():
-    data = sd.get('arrays8')
+def arrays8_subscriber(data):
     print('array8 received: ', data)
 
 
-def arrays16_subscriber():
-    data = sd.get('arrays16')
+def arrays16_subscriber(data):
     print('array16 received: ', data)
 
 
-def arrays32_subscriber():
-    data = sd.get('arrays32')
+def arrays32_subscriber(data):
     print('array32 received: ', data)
 
     
