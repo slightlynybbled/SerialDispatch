@@ -39,8 +39,8 @@ two parameters, the topic and the function to associate with the topic.  Continu
 with the starting code above:
 
 ```python
-def my_subscriber_function():
-    print('subscriber executed')
+def my_subscriber_function(data):
+    print('subscriber executed, received data: ', data)
     
 ps.subscribe('foo', my_subscriber_function)
 #                           ^ subscribing function
@@ -48,28 +48,21 @@ ps.subscribe('foo', my_subscriber_function)
 ```
     
 After executing the above code, every time that the topic `foo` is received, the string
-'subscriber executed' will be output to the console.
+`subscriber executed, received data: ` will be output to the console along with the received data.
 
-## Retrieving Data ##
+The format of data depends on the format of the data received.  If the data received is in the format
+of a string, then a string is returned.  If the data received is a single numerical value, then the
+numerical value is returned.  If the data received is an array of data, then the array is returned in
+the form of a Python list, and if multiple arrays are returned, then a list of lists is generated.
 
-When data is received on a topic, it is stored by topic.  Usually, the data will be
-retrieved by the subscriber, but doesn't have to be.
+A list of lists allows us to receive multi-dimensional data within a single message.  For instance,
+if data to be sent was a series of (x, y) coordinates, we get all of the data at once.  Note that this
+must be done from within the callback:
 
-```python 
-data = ps.get_data('foo')
-#                    ^ topic to get data from
-```
-    
-The format of datais in the form of a list of lists.  A list of lists allows us to receive
-multi-dimensional data within a single message.  For instance, if data to be sent was a series
-of (x, y) coordinates, we get all of the data at once.  Note that this *should* be done from
-within the callback:
+```python
+def my_callback(data)
+    x, y = data  # split the data into the two expected values
 
-```python 
-    xy_data = ps.get_data('xy')  # assuming topic is called 'xy'
-    x = xy_data[0]
-    y = xy_data[1]
-    
     # now do some stuff with the data...
 ```
 
@@ -80,16 +73,12 @@ Publishing to a topic is simple, but has to follow a format as well.  If you sim
 send a string, you can simply
 
 ```python 
-ps.publish('foo', [['my string']])
-#                        ^ string within a list of lists
+ps.publish('foo', 'my string')
+#                     ^ string
 #            ^ topic
 ```
 
-
-    
-This will publish 'my string' to the topic 'foo'.  Again, note that this is a list of lists.  This
-format allows us - again - to publish multi-dimensional data.  If the data is any format but a string,
-it must have another list with all format specifiers that correspond to the data formats.
+This will publish 'my string' to the topic 'foo'.
 
 Using the (x, y) idea once again, the data is in two dimensions.
 
@@ -119,25 +108,26 @@ You can find more details at [for(embed)](http://www.forembed.com/category/dispa
 
 # Example Usage #
 
-You can find a simple - although, complete - sample code below:
+There is a working example that demonstrates working with multiple data types within
+the `/examples` directory.  A quick - but complete - example is shown below.
 
-```python 
+```python
 import serialdispatch
 
 # define your serial port or supply it otherwise
-port = serial.Serial("COM9", baudrate=57600, timeout=0.1)
+port = serial.Serial("COM9", baudrate=57600, timeout=0.01)
 
 # create a new instance of SerialDispatch
 ps = serialdispatch.SerialDispatch(port)
 
 # create your subscribers
-def array_subscriber():
+def array_subscriber(data):
     # retrieve received data for topic 'bar' and print to screen
-    print('data: ', ps.get_data('bar'))
+    print('data: ', data)
 
-def i_subscriber():
+def i_subscriber(data):
     # retrieve received data for topic 'i' and print to screen
-    print('i: ', ps.get_data('i'))
+    print('i: ', data)
 
 # use the instance of SerialDispatch to associate the subscriber function with the topic
 ps.subscribe('bar', array_subscriber)
@@ -147,8 +137,8 @@ ps.subscribe('i', i_subscriber)
 while True:
     ''' publish 'a test message', to subscribers of 'foo', note
         that the message must be in a list of lists '''
-    ps.publish('foo', [['a test message']])
-    time.sleep(0.4)
+    ps.publish('foo', 'a test message')
+    time.sleep(1.0)
 ```
 
 # Contributions #
