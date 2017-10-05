@@ -45,6 +45,7 @@ def main(port, baudrate, log_path, csv_path, version):
 
         '''for i, e in enumerate(data):
             add_point(i, e)'''
+        raise NotImplementedError
 
     def log(data):
         if not log_path:
