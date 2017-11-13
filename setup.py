@@ -39,6 +39,6 @@ setup(
     license='MIT',
     packages=find_packages(),
     install_requires=requirements,
-    entry_points={'console_scripts': ['booty = booty.__main__:main']},
+    entry_points={'console_scripts': ['serialdispatch = serialdispatch.__main__:main']},
     zip_safe=False
 )
