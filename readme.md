@@ -20,8 +20,47 @@ Raspberry Pi 2 (a Debian distribution) within the
 ## Setup ##
 
     pip install serialdispatch
+    
+## Operating Modes ##
 
-## Initialization ##
+There are two ways to utilize `SerialDispatch`, embedded within your application or free-running.  When embedded, `serialdispatch` works as a middle man which can publish and subscribe to data streams.  When free-running, `serialdispatch` subscribes to the `log` and `csv` messages, allowing you to easily archive any information received on the serial port.
+
+## Free-Running ##
+
+Free-running mode is the simplest way to log your microcontroller messages and data with very little effort.
+
+### Initialization ###
+
+Simply `serialdispatch <options>` and the application will wait to write to CSV files or to logs.
+
+    Usage: serialdispatch [OPTIONS]
+    
+    Options:
+      -p, --port TEXT      port name
+      -b, --baudrate TEXT  baud rate, bits/s
+      -l, --log-path TEXT  path to log file
+      -c, --csv-path TEXT  path to csv file
+      -V, --version        Show software version
+      --help               Show this message and exit.
+      
+An example might be:
+
+    $ > serialdispatch --port COM4 --log-path log.txt --csv-path dat.csv
+    
+Now, on your microcontroller, you can simply publish to 'log' and 'csv' in order to archive data!
+
+    /* publish to a log */
+    DIS_publish("log", "the event occured!");
+    
+    /* publish to a csv file using the lettered column headers */
+    DIS_publish("csv", "a, b, c, d,e,f,g,h,i,j");
+    DIS_publish("csv:10,u8", arrayToPlot);
+        
+The `log.txt` will be appended with `2017-11-13 11:56:47.612014 - the event occured!` and the `dat.csv` will be appended with the array data.
+
+## Embedded ##
+
+### Initialization ###
 
 The `SerialDispatch` object must be created before accessing any of the SerialDispatch methods.
 On instantiation, `SerialDispatch` must be supplied with a port which is byte-aligned and
@@ -32,7 +71,7 @@ byte-aligned communications channel that has the same interface.
     port = serial.Serial("COM9", baudrate=57600, timeout=0.1)
     ps = serialdispatch.SerialDispatch(port)
 
-## Subscribing ##
+### Subscribing ###
 
 Subscribing is done using the `SerialDispatch.subscribe()` function.  This function takes
 two parameters, the topic and the function to associate with the topic.  Continuing
@@ -66,8 +105,7 @@ def my_callback(data)
     # now do some stuff with the data...
 ```
 
-
-## Publishing ##
+### Publishing ###
 
 Publishing to a topic is simple, but has to follow a format as well.  If you simply want to
 send a string, you can simply
@@ -101,7 +139,7 @@ format specifiers:
  * `S16`
  * `U32`
  * `S32`
- 
+
 # More details #
 
 You can find more details at [for(embed)](http://www.forembed.com/category/dispatch.html).
