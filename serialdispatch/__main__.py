@@ -40,7 +40,6 @@ def main(port, baudrate, log_path, csv_path, version):
     csv_header = None
 
     def plot(data):
-        nonlocal plot_app
         logger.debug('plot data received: {}'.format(data))
 
         '''for i, e in enumerate(data):
