@@ -1,3 +1,4 @@
 *.X/
 *__pycache__/
 *.idea/
+serialdispatch.egg-info/
